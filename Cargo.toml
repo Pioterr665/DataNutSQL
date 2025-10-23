@@ -1,8 +1,0 @@
-[package]
-name = "DataNutSQL"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-gtk4 = "0.10.1"
-libpq-sys = "0.8.0"
