@@ -27,7 +27,7 @@ func main() {
 	user := widget.NewEntry()
 	user.SetPlaceHolder("Username")
 
-	password := widget.NewEntry()
+	password := widget.NewPasswordEntry()
 	password.SetPlaceHolder("Password")
 
 	login_btn := widget.NewButton("LogIn", nil)
