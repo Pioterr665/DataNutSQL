@@ -93,6 +93,30 @@ func ShowMainWindow(a fyne.App, db drivers.DatabaseDriver) {
 		suggestPopup.Show()
 	}
 
+	var tableNames []string
+	for table := range schema {
+		tableNames = append(tableNames, table)
+	}
+
+	tree := widget.NewTree(
+		func(uid string) []string {
+			if uid == "" {
+				return tableNames
+			}
+			return nil
+		},
+		func(uid string) bool {
+			return uid == ""
+		},
+		func(branch bool) fyne.CanvasObject {
+			return widget.NewLabel("")
+		},
+		func(uid string, branch bool, obj fyne.CanvasObject) {
+			obj.(*widget.Label).SetText(uid)
+		},
+	)
+	tree.OpenAllBranches()
+
 	var tableData [][]any
 	table := widget.NewTable(
 		func() (int, int) {
@@ -102,17 +126,15 @@ func ShowMainWindow(a fyne.App, db drivers.DatabaseDriver) {
 			return len(tableData), len(tableData[0])
 		},
 		func() fyne.CanvasObject {
-			entry := widget.NewEntry()
-			entry.Disable()
-			return entry
+			return widget.NewLabel("")
 		},
 		func(id widget.TableCellID, o fyne.CanvasObject) {
-			entry := o.(*widget.Entry)
+			label := o.(*widget.Label)
 			i, j := id.Row, id.Col
 			if len(tableData) == 0 {
-				entry.SetText("")
+				label.SetText("")
 			} else {
-				entry.SetText(fmt.Sprintf("%v", tableData[i][j]))
+				label.SetText(fmt.Sprintf("%v", tableData[i][j]))
 			}
 		},
 	)
@@ -153,7 +175,13 @@ func ShowMainWindow(a fyne.App, db drivers.DatabaseDriver) {
 
 	split := container.NewVSplit(top, tableScroll)
 	split.Offset = 0.25
-
-	w.SetContent(split)
+	treeInfo := widget.NewLabel("Available tables:")
+	leftPanel := container.NewBorder(treeInfo, nil, nil, nil, tree)
+	content := container.NewHSplit(
+		container.NewVScroll(leftPanel),
+		split,
+	)
+	content.Offset = 0.2
+	w.SetContent(content)
 	w.Show()
 }
